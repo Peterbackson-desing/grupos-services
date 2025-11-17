@@ -29,6 +29,38 @@ public class GrupoController {
     @Autowired
     private GrupoUsuarioRepository grupoUsuarioRepository;
 
+    
+    // Obtener grupos desde la tabla principal
+    @GetMapping("/all")
+    public List<GrupoListDTO> getAllGrupos() {
+        return grupoRepository.findAll()
+                .stream()
+                .map(grupo -> {
+                    GrupoListDTO dto = new GrupoListDTO();
+                    dto.setId(grupo.getId());
+                    dto.setNombre(grupo.getNombre());
+                    dto.setCuatrimestre(grupo.getCuatrimestre());
+                    dto.setEstado(grupo.getEstado());
+
+                    int cantidadAlumnos = grupoUsuarioRepository.findByGrupo_Id(grupo.getId()).size();
+                    dto.setCantidadAlumnos(cantidadAlumnos);
+
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
+    // Ver grupo con sus alumnos
+    @GetMapping("/{id}")
+    public ResponseEntity<GrupoResponseDTO> getGrupoConAlumnos(@PathVariable int id) {
+        GrupoResponseDTO grupo = grupoService.findByIdWithAlumnos(id);
+        if (grupo != null) {
+            return ResponseEntity.ok(grupo);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+
     @PostMapping
     public ResponseEntity<GruposEntity> crearGrupo(@RequestBody GrupoDTO grupoDTO) {
         GruposEntity nuevoGrupo = grupoService.crearGrupo(grupoDTO);
@@ -41,5 +73,15 @@ public class GrupoController {
         grupoDTO.setId(id);
         GruposEntity grupoActualizado = grupoService.actualizarGrupo(grupoDTO);
         return ResponseEntity.ok(grupoActualizado);
+    //Funcionalidad de habilitar -- Maria Fernanda Rosas Briones IDGS12
+    @PutMapping("/habilitar/{id}")
+    public ResponseEntity<String> habilitarGrupo(@PathVariable Integer id) {
+        boolean habilitado = grupoService.habilitarGrupo(id);
+
+        if (!habilitado) {
+            return ResponseEntity.badRequest().body("No se encontró el grupo o ya estaba habilitado.");
+        }
+
+        return ResponseEntity.ok("Grupo habilitado correctamente.");
     }
 }
