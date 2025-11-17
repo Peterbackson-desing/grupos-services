@@ -37,4 +37,14 @@ public class GrupoService {
         return grupoRepository.save(grupo);
     }
 
+    // Actualizar grupo
+    @Transactional
+    public GruposEntity actualizarGrupo(GrupoDTO grupoDTO) {
+        GruposEntity grupo = grupoRepository.findById(grupoDTO.getId()).orElse(new GruposEntity());
+        grupo.setNombre(grupoDTO.getNombre());
+        grupo.setCuatrimestre(grupoDTO.getCuatrimestre());
+        grupo.setEstado(grupoDTO.getEstado());
+        return grupoRepository.save(grupo);
+    }
+
 }
