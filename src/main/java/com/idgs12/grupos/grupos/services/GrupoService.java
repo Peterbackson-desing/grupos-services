@@ -28,6 +28,48 @@ public class GrupoService {
     @Autowired
     private UsuarioFeignClient usuarioFeignClient;
 
+    // Ver grupo con sus alumnos
+    public GrupoResponseDTO findByIdWithAlumnos(int grupoId) {
+        // Buscar el grupo
+        GruposEntity grupo = grupoRepository.findById(grupoId).orElse(null);
+
+        if (grupo == null) {
+            return null;
+        }
+
+        GrupoResponseDTO response = new GrupoResponseDTO();
+        response.setId(grupo.getId());
+        response.setNombre(grupo.getNombre());
+        response.setCuatrimestre(grupo.getCuatrimestre());
+        response.setEstado(grupo.getEstado());
+
+        // Obtener relaciones grupo-usuario
+        List<GrupoUsuario> grupoUsuarios = grupoUsuarioRepository.findByGrupo_Id(grupoId);
+
+        System.out.println("Grupo ID: " + grupoId);
+        System.out.println("Relaciones encontradas: " + grupoUsuarios.size());
+
+        // Obtener info alumnos
+        List<UsuarioDTO> alumnos = grupoUsuarios.stream()
+                .map(gu -> {
+                    try {
+                        System.out.println("Buscando usuario ID: " + gu.getUsuarioId());
+                        UsuarioDTO usuario = usuarioFeignClient.getUsuarioById(gu.getUsuarioId());
+                        System.out.println("Usuario encontrado: " + usuario.getNombre());
+                        return usuario;
+                    } catch (Exception e) {
+                        System.err.println("Error al obtener usuario: " + e.getMessage());
+                        return null;
+                    }
+                })
+                .filter(u -> u != null)
+                .collect(Collectors.toList());
+
+        response.setAlumnos(alumnos);
+
+        return response;
+    }
+
     @Transactional
     public GruposEntity crearGrupo(GrupoDTO grupoDTO) {
         GruposEntity grupo = new GruposEntity();
