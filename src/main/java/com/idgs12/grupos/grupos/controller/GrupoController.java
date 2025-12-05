@@ -73,15 +73,6 @@ public class GrupoController {
         grupoDTO.setId(id);
         GruposEntity grupoActualizado = grupoService.actualizarGrupo(grupoDTO);
         return ResponseEntity.ok(grupoActualizado);
-    //Funcionalidad de habilitar -- Maria Fernanda Rosas Briones IDGS12
-    @PutMapping("/habilitar/{id}")
-    public ResponseEntity<String> habilitarGrupo(@PathVariable Integer id) {
-        boolean habilitado = grupoService.habilitarGrupo(id);
-
-        if (!habilitado) {
-            return ResponseEntity.badRequest().body("No se encontró el grupo o ya estaba habilitado.");
-        }
-
-        return ResponseEntity.ok("Grupo habilitado correctamente.");
     }
+    
 }

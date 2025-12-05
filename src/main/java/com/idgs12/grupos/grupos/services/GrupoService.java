@@ -78,12 +78,8 @@ public class GrupoService {
         grupo.setEstado(grupoDTO.getEstado());
         return grupoRepository.save(grupo);
     }
-    //Funcionalidad de habilitar -- Maria Fernanda Rosas Briones IDGS12
-    @Transactional
-    public boolean habilitarGrupo(Integer id) {
-        GruposEntity grupo = grupoRepository.findById(id).orElse(null);
 
-    // Actualizar grupo
+     // Actualizar grupo
     @Transactional
     public GruposEntity actualizarGrupo(GrupoDTO grupoDTO) {
         GruposEntity grupo = grupoRepository.findById(grupoDTO.getId()).orElse(new GruposEntity());
@@ -91,18 +87,5 @@ public class GrupoService {
         grupo.setCuatrimestre(grupoDTO.getCuatrimestre());
         grupo.setEstado(grupoDTO.getEstado());
         return grupoRepository.save(grupo);
-    }
-
-        if (grupo == null) {
-            return false; 
-        }
-
-        if (Boolean.TRUE.equals(grupo.getEstado())) {
-            return false;
-        }
-
-        grupo.setEstado(true);
-        grupoRepository.save(grupo);
-        return true;
     }
 }
